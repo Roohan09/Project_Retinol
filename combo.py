@@ -296,17 +296,165 @@ import cv2
 # 1️⃣ DEVICE SETUP
 # =====================================================
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+import streamlit as st
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torchvision import models, transforms
+from PIL import Image
+import numpy as np
+import cv2
 
-st.set_page_config(page_title="OCT Analyzer", page_icon="👁️", layout="wide")
+# =====================================================
+# 1️⃣ DEVICE SETUP
+# =====================================================
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# Set wide layout
+st.set_page_config(layout="wide")
+
+# =====================================================
+# 🌟 STYLING (CSS)
+# =====================================================
 st.markdown("""
-    <h1 style='text-align: center; color: #1E90FF;'>👁️ Retinal OCT Analyzer</h1>
-    <h4 style='text-align: center; color: #808080;'>
-        AI-powered tool for disease classification and DME lesion segmentation
-    </h4>
-    <hr style='border:1px solid #ccc'>
+    <style>
+        /* ====== Overall App ====== */
+        .stApp {
+            background-color: #F4F8FF;  /* Light medical blue background */
+        }
+
+        /* ====== Sidebar Styling ====== */
+        section[data-testid="stSidebar"] {
+            background-color: #E6F0FF;
+        }
+
+        /* ====== Headings & Text ====== */
+        h1, h2, h3, h4, h5, h6 {
+            color: #1E90FF;
+            text-align: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        /* This rule now only targets paragraphs, 
+           so it doesn't break st.info, st.success, etc. */
+        p {
+            color: #002147;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* ====== Upload Box (Modern Look, No Browse Button) ====== */
+        div[data-testid="stFileUploader"] {
+            background-color: #FFFFFF !important;
+            border: 2px dashed #1E90FF !important;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            width: 60% !important;
+            margin: 0 auto !important;
+            transition: all 0.3s ease;
+        }
+
+        div[data-testid="stFileUploader"]:hover {
+            background-color: #F0F8FF !important;
+            border-color: #1560BD !important;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+        }
+
+        /* Upload Label (Top Title) */
+        div[data-testid="stFileUploader"] label {
+            color: #1E90FF !important;
+            font-weight: 700 !important;
+            font-size: 1.1rem !important;
+            text-align: center;
+            display: block;
+            margin-bottom: 0.6rem;
+        }
+
+        /*
+        ✅ FIXED: Specific selectors for the file uploader's internal text
+        This targets the actual drag-and-drop zone and its text, 
+        making it visible against the dark background.
+        */
+        div[data-testid="stFileUploaderDropzone"] {
+            background-color: #0056B3 !important; /* Darker blue for the drag area */
+            border-radius: 10px;
+            padding: 1rem;
+            color: #BBDEFB !important; /* Lighter text for contrast */
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        div[data-testid="stFileUploaderDropzone"] p {
+            color: #BBDEFB !important; /* Ensure p tags inside are also light */
+            font-weight: 600 !important;
+        }
+
+        div[data-testid="stFileUploaderDropzone"] span {
+            color: #BBDEFB !important; /* Ensure span tags inside are also light */
+            font-weight: 500 !important;
+        }
+        
+        div[data-testid="stFileUploaderDropzone"] small {
+            color: #BBDEFB !important; /* Ensure small tags inside are also light */
+            font-weight: 500 !important;
+        }
+
+
+        /* Hide the default "Browse files" button, as requested in previous iterations */
+        div[data-testid="stFileUploader"] button {
+            display: none !important;
+        }
+
+        /* ====== Dropdown Styling (Keep Original Look) ====== */
+        div[data-baseweb="select"] {
+            background-color: #E6F0FF !important;
+            border: 1px solid #1E90FF !important;
+            border-radius: 8px !important;
+        }
+        div[data-baseweb="select"] div {
+            color: #002147 !important;
+        }
+        div[data-baseweb="select"]:hover {
+            background-color: #d9e8ff !important;
+        }
+
+        /* ====== Primary Buttons ====== */
+        button[kind="primary"] {
+            background-color: #1E90FF !important;
+            color: white !important;
+            border-radius: 8px !important;
+            border: none !important;
+        }
+        button[kind="primary"]:hover {
+            background-color: #1560BD !important;
+        }
+
+        /* ====== Image Styling ====== */
+        img {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        /* Robustly center images and their captions */
+        div[data-testid="stImage"] {
+            text-align: center;
+        }
+    </style>
 """, unsafe_allow_html=True)
 
+
+st.markdown("""
+    <div style='text-align: center; padding-top: 1rem; padding-bottom: 0.5rem;'>
+        <h1 style='color: #1E90FF; font-family: "Segoe UI", sans-serif; font-weight: 800;'>
+            👁️ Retinal OCT Analyzer
+        </h1>
+        <h4 style='color: #003366; font-family: "Segoe UI", sans-serif; font-weight: 500; margin-top: -10px;'>
+            AI-powered tool for <span style="color:#1560BD;">disease classification</span> 
+            and <span style="color:#1560BD;">DME lesion segmentation</span>
+        </h4>
+        <hr style='border:1px solid #B0C4DE; width:70%; margin:auto; margin-top:1rem;'>
+    </div>
+""", unsafe_allow_html=True)
 
 # =====================================================
 # 2️⃣ CLASSIFICATION MODEL (ResNet18)
