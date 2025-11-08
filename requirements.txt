@@ -1,7 +1,8 @@
+# requirements.txt
 streamlit==1.38.0
-torch==2.0.1
-torchvision==0.15.2
-torchaudio==2.0.2
-opencv-python-headless==4.9.0.80
-Pillow==10.2.0
+torch==2.5.1
+torchvision==0.20.1
+torchaudio==2.5.1
+opencv-python-headless==4.10.0.84
+Pillow==10.4.0
 numpy==1.26.4
