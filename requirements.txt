@@ -1,8 +1,16 @@
-# requirements.txt
+# === Streamlit App Dependencies ===
 streamlit==1.38.0
-torch==2.5.1
-torchvision==0.20.1
-torchaudio==2.5.1
+
+# === PyTorch CPU-compatible versions for Python 3.10 ===
+torch==2.0.1
+torchvision==0.15.2
+torchaudio==2.0.2
+
+# === Image and Array Processing ===
 opencv-python-headless==4.10.0.84
 Pillow==10.4.0
 numpy==1.26.4
+
+# === Stability dependencies ===
+protobuf==4.25.3
+typing-extensions==4.9.0
