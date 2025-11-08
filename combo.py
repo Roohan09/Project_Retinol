@@ -52,8 +52,8 @@ st.markdown("""
         p {
             color: #002147;
             font-family: 'Segoe UI', sans-serif;
-            font-size: 1.05rem; /* Slightly larger */
-            line-height: 1.6; /* More spacing */
+            /* ✅ REMOVED: font-size: 1.05rem; */
+            /* ✅ REMOVED: line-height: 1.6; */
             font-weight: 400;
         }
 
@@ -61,8 +61,8 @@ st.markdown("""
         li {
             color: #002147; /* Match paragraph color */
             font-family: 'Segoe UI', sans-serif;
-            font-size: 1.05rem; /* Match paragraph size */
-            font-weight: 500; /* A bit heavier than normal */
+            /* ✅ REMOVED: font-size: 1.05rem; */
+            /* ✅ REMOVED: font-weight: 500; */
             margin-bottom: 0.5rem; /* Add spacing */
             margin-left: 1rem;
         }
@@ -159,8 +159,8 @@ st.markdown("""
             padding: 1rem;
         }
         div[data-testid="stInfo"] p {
-            font-size: 1.1rem !important;
-            font-weight: 600 !important;
+            /* ✅ REMOVED: font-size: 1.1rem !important; */
+            /* ✅ REMOVED: font-weight: 600 !important; */
             color: #002147 !important;
         }
 
@@ -171,8 +171,8 @@ st.markdown("""
             padding: 1rem;
         }
         div[data-testid="stWarning"] p {
-            font-size: 1.1rem !important;
-            font-weight: 600 !important;
+            /* ✅ REMOVED: font-size: 1.1rem !important; */
+            /* ✅ REMOVED: font-weight: 600 !important; */
             color: #5F4D00 !important;
         }
 
@@ -485,8 +485,8 @@ if uploaded_file and clf_model and seg_model:
         col1, col2 = st.columns(2)
         
         with col1:
-            # ✅ UPDATED: Changed from use_container_width=400 to True
-            st.image(image, caption="Uploaded OCT Scan", use_container_width=400)
+            # ✅ UPDATED: Changed to width=400
+            st.image(image, caption="Uploaded OCT Scan", width=400)
             # ✅ REMOVED: The illustrative diagram is gone
         
         with col2:
@@ -508,11 +508,11 @@ if uploaded_file and clf_model and seg_model:
             
             seg_col1, seg_col2 = st.columns(2)
             with seg_col1:
-                # ✅ UPDATED: Changed from use_container_width=400 to True
-                st.image(mask * 255, caption="🧠 Binary Mask", use_container_width=400)
+                # ✅ UPDATED: Changed to width=400
+                st.image(mask * 255, caption="🧠 Binary Mask", width=400)
             with seg_col2:
-                # ✅ UPDATED: Changed from use_container_width=400 to True
-                st.image(highlighted_image, caption="🩺 Highlighted DME Region", use_container_width=400)
+                # ✅ UPDATED: Changed to width=400
+                st.image(highlighted_image, caption="🩺 Highlighted DME Region", width=400)
 
             if disease_area < 0.5:
                 st.success("✅ Minimal or no lesion detected — likely normal or very early-stage.")
