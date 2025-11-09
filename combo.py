@@ -486,7 +486,7 @@ if uploaded_file and clf_model and seg_model:
     # ✅ UPDATED: Replaced st.subheader with st.markdown for custom color
     st.markdown("<h3 style='color: #003366;'>🔬 Analysis Results</h3>", unsafe_allow_html=True)
     
-    tab1, tab2, tab3 = st.tabs(["📊 Classification Report", "🩺 Segmentation Analysis (DME)", "🧠 Model Insights"])
+    tab1, tab2, tab3 = st.tabs(["📊 Classification Report", "🩺 Segmentation Analysis (DME)", ""])
 
     # --- TAB 1: CLASSIFICATION REPORT ---
     with tab1:
